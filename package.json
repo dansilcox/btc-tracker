@@ -6,7 +6,7 @@
     "ng": "ng",
     "migrate": "node-pg-migrate",
     "start": "node server.js",
-    "build": "ng build && npm run migrate up",
+    "build": "npm run migrate up",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
