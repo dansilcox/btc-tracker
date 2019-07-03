@@ -36,7 +36,7 @@ app.use(compression());
 app.use(bodyParser.json());
 
 // Serve only the static files form the dist directory
-app.use(express.static(__dirname + '/dist/btc-tracker'));
+app.use(express.static(__dirname + '/dist'));
 
 
 // Routes
