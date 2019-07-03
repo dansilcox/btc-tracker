@@ -49,7 +49,7 @@ app.get('/api/ping', function (req, res) {
   res.status(200).json({pong: (new Date()).toISOString()})
 })
 
-app.get('/api/price', function (req, res) {
+app.get('/api/prices', function (req, res) {
   const options = {
     uri: BASE_PRICE_URL,
     json: true
