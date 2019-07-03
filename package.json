@@ -24,6 +24,7 @@
     "@angular/platform-browser": "~8.0.3",
     "@angular/platform-browser-dynamic": "~8.0.3",
     "@angular/router": "~8.0.3",
+    "compression": "^1.7.4",
     "core-js": "^2.5.4",
     "express": "^4.17.1",
     "node-pg-migrate": "^3.21.1",
