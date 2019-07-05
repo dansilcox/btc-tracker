@@ -30,7 +30,7 @@ bower_components
 .lock-wscript
 
 # Built artifacts
-build/
+build
 
 # Dependency directories
 node_modules/
