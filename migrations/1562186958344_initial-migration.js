@@ -3,7 +3,12 @@ exports.shorthands = undefined;
 exports.up = (pgm) => {
   pgm.createTable("event_triggers", {
     id: "id",
-    name: { type: "varchar(256)", notNull: true, desc: "Name of the event trigger (e.g. 'Price lower bound')" },
+    name: { 
+      type: "varchar(256)", 
+      notNull: true, 
+      desc: "Name of the event trigger (e.g. 'Price lower bound')",
+      unique: true
+    },
     desc: { type: "varchar(1500)", default: null, desc: "Longer description if required" },
     triggerCurrency: { type: "varchar(3)", notNull: true, desc: "Currency to go with price for trigger"},
     triggerPrice: { 
@@ -20,7 +25,12 @@ exports.up = (pgm) => {
 
   pgm.createTable("events", {
     id: "id",
-    name: { type: "varchar(256)", notNull: true, desc: "Name of the event (e.g. 'send email')" },
+    name: { 
+      type: "varchar(256)", 
+      notNull: true, 
+      desc: "Name of the event (e.g. 'send email')", 
+      unique: true 
+    },
     desc: { type: "varchar(1500)", default: null, desc: "Longer description if required"},
     eventType: { type: "varchar(50)", desc: "Type of event (TODO: make this an enum or lookup to another table)"},
     createdAt: {

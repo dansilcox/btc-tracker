@@ -1,0 +1,540 @@
+{
+	"info": {
+		"_postman_id": "6f56697d-461a-402c-8709-8714de248634",
+		"name": "BTC tracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Events",
+			"item": [
+				{
+					"name": "Create Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response time is less than 100ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.equal(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response should contain server-created fields\", () => {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.id).to.be.greaterThan(0, 'Expect response to contain a valid id');",
+									"    pm.environment.set('eventId', jsonData.id);",
+									"    ",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"    pm.expect(Date.parse(jsonData.createdAt)).to.be.greaterThan(0, 'Expect response to contain valid createdAt date');",
+									"});",
+									"",
+									"pm.test(\"Response should match request\", () => {",
+									"    const expectedValues = JSON.parse(pm.environment.get('createEventBody'));",
+									"    Object.keys(expectedValues).forEach((key) => {",
+									"       pm.expect(jsonData).to.have.property(key, expectedValues[key].replace(\"<script>alert('foo')</script>\", ''), 'Expect response body to have key ' + key); ",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									"pm.environment.set('createEventBody', JSON.stringify({",
+									"    name: \"Send email!!<script>alert('foo')</script>\",",
+									"    desc: \"Send an email to the configured address\",",
+									"    eventType: \"SendEmail\",",
+									"    properties: JSON.stringify({\"email\": \"foo@bar.com\"})",
+									"}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{createEventBody}}"
+						},
+						"url": {
+							"raw": "{{host}}/api/events",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Event Duplicate (expect 409)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response time is less than 100ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 409\", () => {",
+									"    pm.response.to.have.status(409);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", () => {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.equal(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response contains message\", () => {",
+									"    pm.expect(jsonData).to.have.property('message', 'Field name must be unique');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									"pm.environment.set('createEventBody', JSON.stringify({",
+									"    name: \"Send email!!<script>alert('foo')</script>\",",
+									"    desc: \"Send an email to the configured address\",",
+									"    eventType: \"SendEmail\",",
+									"    properties: JSON.stringify({\"email\": \"foo@bar.com\"})",
+									"}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{createEventBody}}"
+						},
+						"url": {
+							"raw": "{{host}}/api/events",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Event by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response time is less than 100ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.equal(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response should contain server-created fields\", () => {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.id).to.be.greaterThan(0, 'Expect response to contain a valid id');",
+									"    pm.expect(parseInt(jsonData.id)).to.equal(parseInt(pm.environment.get('eventId')));",
+									"    ",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"    pm.expect(Date.parse(jsonData.createdAt)).to.be.greaterThan(0, 'Expect response to contain valid createdAt date');",
+									"});",
+									"",
+									"pm.test(\"Response should match POST-ed body\", () => {",
+									"    const expectedValues = JSON.parse(pm.environment.get('createEventBody'));",
+									"    Object.keys(expectedValues).forEach((key) => {",
+									"       pm.expect(jsonData).to.have.property(key, expectedValues[key].replace(\"<script>alert('foo')</script>\", ''), 'Expect response body to have key ' + key); ",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/events/{{eventId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Event by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response time is less than 100ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.equal(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response should contain server-created fields\", () => {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.id).to.be.greaterThan(0, 'Expect response to contain a valid id');",
+									"    pm.expect(parseInt(jsonData.id)).to.equal(parseInt(pm.environment.get('eventId')));",
+									"    ",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"    pm.expect(Date.parse(jsonData.createdAt)).to.be.greaterThan(0, 'Expect response to contain valid createdAt date');",
+									"});",
+									"",
+									"pm.test(\"Response should match requested body\", () => {",
+									"    const expectedValues = JSON.parse(pm.environment.get('updateEventBody'));",
+									"    Object.keys(expectedValues).forEach((key) => {",
+									"       pm.expect(jsonData).to.have.property(key, expectedValues[key].replace(\"<script>alert('foo')</script>\", ''), 'Expect response body to have key ' + key); ",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									"pm.environment.set('updateEventBody', JSON.stringify({",
+									"    name: \"Send email - updated<script>alert('foo')</script>\",",
+									"    desc: \"Send an email to the configured address (updated version)\",",
+									"    eventType: \"SendEmailUpdated\",",
+									"    properties: JSON.stringify({\"email\": \"foo@bar-updated.com\"})",
+									"}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{updateEventBody}}"
+						},
+						"url": {
+							"raw": "{{host}}/api/events/{{eventId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Event by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"pm.test(\"Response time is less than 100ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 204\", () => {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.test(\"Response has no body\", function () {",
+									"    pm.response.to.have.body(\"\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/events/{{eventId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Event by ID Again (expect 404)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response time is less than 100ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Response body contains message\", () => {",
+									"   pm.expect(jsonData).to.have.property('message', 'Item not found with ID ' + pm.environment.get('eventId')); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/events/{{eventId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Event by ID (not found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response time is less than 100ms\", () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 404\", () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", () => {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.equal(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response should contain message\", () => {",
+									"    pm.expect(jsonData).to.have.property('message', 'No item found with ID ' + pm.environment.get('eventId'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/events/{{eventId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
