@@ -251,6 +251,94 @@
 					"response": []
 				},
 				{
+					"name": "Get All Events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a295976b-6401-470f-9cdc-966c147c6900",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Response time is less than 100ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test(\"Response status code should be 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.equal(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response should contain records with all relevant fields, including POSTed record\", () => {",
+									"    pm.expect(jsonData).to.have.property('collection');",
+									"    const expectedValues = JSON.parse(pm.environment.get('createEventBody'));",
+									"    const eventPosted = jsonData.collection.find((ev) => {",
+									"        return parseInt(ev.id) === parseInt(pm.environment.get('eventId'));",
+									"    });",
+									"",
+									"    jsonData.collection.forEach((event) => {",
+									"        console.log(event);",
+									"        pm.expect(event).to.have.property('id');",
+									"        pm.expect(event.id).to.be.greaterThan(0, 'Expect response to contain a valid id');",
+									"        ",
+									"        pm.expect(event).to.have.property('createdAt');",
+									"        pm.expect(Date.parse(event.createdAt)).to.be.greaterThan(0, 'Expect response to contain valid createdAt date');",
+									"",
+									"        Object.keys(expectedValues).forEach((key) => {",
+									"            pm.expect(event).to.have.property(key); ",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "976c3d1b-dea7-4ec1-be8c-0870eab4f1dd",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/events",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Update Event by ID",
 					"event": [
 						{

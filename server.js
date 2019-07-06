@@ -95,6 +95,24 @@ app.post('/api/events', (req, res) => {
   );
 });
 
+app.get('/api/events', (req, res) => {
+  return pool.query(
+    'SELECT "id", "name", "desc", "eventType", "createdAt", "properties" FROM "events"',
+    (error, results) => {
+      if (error) {
+        console.log('Error message: ' + error);
+        return res.status(400).send({message: 'Error: failed finding items : ' + error})
+      }
+
+      if (results.rowCount === 0) {
+        return res.status(200).send({collection:[]});
+      }
+
+      return res.status(200).send({collection:results.rows});
+    }
+  );
+});
+
 app.get('/api/events/:id', (req, res) => {
   const id = req.params.id;
   if (typeof id === 'undefined') {
