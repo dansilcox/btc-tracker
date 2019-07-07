@@ -18,8 +18,8 @@
 								"exec": [
 									"const jsonData = pm.response.json();",
 									"",
-									"pm.test(\"Response time is less than 100ms\", function () {",
-									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"pm.test(\"Response time is less than 250ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(250);",
 									"});",
 									"",
 									"pm.test(\"Response status code should be 201\", () => {",
